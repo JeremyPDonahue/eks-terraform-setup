@@ -24,3 +24,21 @@ module "worker_nodes" {
   subnet_ids   = module.vpc.public_subnet_ids
   worker_nodes_role_arn = module.iam.worker_nodes_role_arn
 }
+
+resource "aws_security_group_rule" "eks_worker_nodes_to_control_plane" {
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = module.eks.cluster_security_group_id
+  source_security_group_id = module.worker_nodes.worker_nodes_security_group_id
+}
+
+resource "aws_security_group_rule" "eks_node_to_node" {
+  type                     = "ingress"
+  from_port                = 10250
+  to_port                  = 10255
+  protocol                 = "tcp"
+  security_group_id        = module.worker_nodes.worker_nodes_security_group_id
+  source_security_group_id = module.worker_nodes.worker_nodes_security_group_id
+}

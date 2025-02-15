@@ -13,3 +13,23 @@ resource "aws_eks_node_group" "worker_nodes" {
     Name = "eks-worker-nodes"
   }
 }
+
+resource "aws_security_group" "worker_nodes_sg" {
+  name        = "eks-worker-nodes-sg"
+  description = "Security group for EKS worker nodes"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
