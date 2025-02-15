@@ -1,4 +1,4 @@
-# Terraform AWS EKS
+# EKS Terraform Setup
 
 ## Overview
 This Terraform project provisions an **Amazon EKS cluster** with a **VPC, IAM roles, and worker nodes** in AWS.
