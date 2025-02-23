@@ -37,16 +37,6 @@ jobs:
       - name: Terraform Init
         run: terraform init
       
-      - name: Check for Existing Terraform Lock
-        run: |
-          LOCK_ID=$(terraform force-unlock -dry-run 2>&1 | grep -oE '[a-f0-9-]{36}' || echo "")
-          if [ -n "$LOCK_ID" ]; then
-            echo "Existing lock detected: $LOCK_ID"
-            terraform force-unlock -force "$LOCK_ID"
-          else
-            echo "No existing Terraform lock found."
-          fi
-      
       - name: Terraform Format
         run: terraform fmt -check
       
@@ -54,11 +44,7 @@ jobs:
         run: terraform validate
       
       - name: Terraform Plan
-        run: terraform plan -parallelism=10 -var="aws_region=${{ secrets.AWS_REGION }}" -var="cluster_name=${{ secrets.CLUSTER_NAME }}" -var="vpc_cidr=${{ secrets.VPC_CIDR }}" -out=tfplan
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: terraform plan -parallelism=10 -lock-timeout=300s -var="aws_region=${{ secrets.AWS_REGION }}" -var="cluster_name=${{ secrets.CLUSTER_NAME }}" -var="vpc_cidr=${{ secrets.VPC_CIDR }}" -out=tfplan
       
       - name: Show Terraform Plan
         run: terraform show -no-color tfplan
@@ -78,6 +64,11 @@ jobs:
     timeout-minutes: 10
     
     steps:
+      - name: Request Manual Approval
+        uses: hmarr/auto-approve-action@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      
       - name: Checkout repository
         uses: actions/checkout@v4
       
@@ -102,8 +93,4 @@ jobs:
         run: terraform init
       
       - name: Terraform Apply (Requires Manual Approval)
-        run: terraform apply tfplan
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: terraform apply -lock-timeout=300s -var="aws_region=${{ secrets.AWS_REGION }}" -var="cluster_name=${{ secrets.CLUSTER_NAME }}" -var="vpc_cidr=${{ secrets.VPC_CIDR }}" tfplan
