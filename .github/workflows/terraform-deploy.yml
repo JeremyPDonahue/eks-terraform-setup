@@ -4,10 +4,14 @@ on:
   push:
     branches:
       - main
-  pull_request:
+  pull_request_target:
     branches:
       - main
   workflow_dispatch:
+
+permissions:
+  pull-requests: write
+  contents: write
 
 jobs:
   terraform-plan:
@@ -54,9 +58,10 @@ jobs:
         with:
           name: terraform-plan
           path: tfplan
-      
+
   terraform-apply:
     name: Terraform Apply (Manual Approval)
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-20.04
     needs: terraform-plan
     environment:
