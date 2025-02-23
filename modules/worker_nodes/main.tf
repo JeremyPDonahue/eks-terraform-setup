@@ -12,6 +12,9 @@ resource "aws_eks_node_group" "worker_nodes" {
   tags = {
     Name = "eks-worker-nodes"
   }
+
+  depends_on = [aws_eks_cluster.js-test-cluster]
+
 }
 
 resource "aws_security_group" "worker_nodes_sg" {

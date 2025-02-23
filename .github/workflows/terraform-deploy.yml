@@ -94,3 +94,33 @@ jobs:
       
       - name: Terraform Apply
         run: terraform apply -lock-timeout=300s -var="aws_region=${{ secrets.AWS_REGION }}" -var="cluster_name=${{ secrets.CLUSTER_NAME }}" -var="vpc_cidr=${{ secrets.VPC_CIDR }}" tfplan
+
+  terraform-destroy:
+    name: Terraform Destroy (Manual Trigger)
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-20.04
+    environment:
+      name: production
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+      
+      - name: Terraform Init
+        run: terraform init
+      
+      - name: Terraform Destroy (Requires Manual Trigger)
+        run: terraform destroy -auto-approve -var="aws_region=${{ secrets.AWS_REGION }}" -var="cluster_name=${{ secrets.CLUSTER_NAME }}" -var="vpc_cidr=${{ secrets.VPC_CIDR }}"
