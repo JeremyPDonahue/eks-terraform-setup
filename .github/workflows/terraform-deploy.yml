@@ -59,9 +59,17 @@ jobs:
           name: terraform-plan
           path: tfplan
       
-      - name: Force Unlock Terraform State (On Plan Timeout)
+      - name: Check and Unlock Terraform State (On Plan Timeout)
         if: failure()
-        run: terraform force-unlock -force || true
+        run: |
+          LOCK_ID=$(terraform force-unlock -dry-run 2>&1 | grep -oE '[a-f0-9-]{36}' || echo "")
+          if [ -n "$LOCK_ID" ]; then
+            echo "Unlocking Terraform state: $LOCK_ID"
+            terraform force-unlock -force "$LOCK_ID"
+          else
+            echo "No Terraform lock detected."
+          fi
+
 
   terraform-apply:
     name: Terraform Apply (Manual Approval)
