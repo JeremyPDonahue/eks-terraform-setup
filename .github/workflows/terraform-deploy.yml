@@ -37,6 +37,16 @@ jobs:
       - name: Terraform Init
         run: terraform init
       
+      - name: Check for Existing Terraform Lock
+        run: |
+          LOCK_ID=$(terraform force-unlock -dry-run 2>&1 | grep -oE '[a-f0-9-]{36}' || echo "")
+          if [ -n "$LOCK_ID" ]; then
+            echo "Existing lock detected: $LOCK_ID"
+            terraform force-unlock -force "$LOCK_ID"
+          else
+            echo "No existing Terraform lock found."
+          fi
+      
       - name: Terraform Format
         run: terraform fmt -check
       
@@ -44,7 +54,7 @@ jobs:
         run: terraform validate
       
       - name: Terraform Plan
-        run: terraform plan -parallelism=10 -out=tfplan
+        run: terraform plan -parallelism=10 -var="aws_region=${{ secrets.AWS_REGION }}" -out=tfplan
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -59,18 +69,6 @@ jobs:
           name: terraform-plan
           path: tfplan
       
-      - name: Check and Unlock Terraform State (On Plan Timeout)
-        if: failure()
-        run: |
-          LOCK_ID=$(terraform force-unlock -dry-run 2>&1 | grep -oE '[a-f0-9-]{36}' || echo "")
-          if [ -n "$LOCK_ID" ]; then
-            echo "Unlocking Terraform state: $LOCK_ID"
-            terraform force-unlock -force "$LOCK_ID"
-          else
-            echo "No Terraform lock detected."
-          fi
-
-
   terraform-apply:
     name: Terraform Apply (Manual Approval)
     runs-on: ubuntu-20.04
