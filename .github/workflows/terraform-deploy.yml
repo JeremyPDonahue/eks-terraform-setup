@@ -61,7 +61,7 @@ jobs:
 
   terraform-apply:
     name: Terraform Apply (Manual Approval)
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-20.04
     needs: terraform-plan
     environment:
@@ -69,11 +69,15 @@ jobs:
     timeout-minutes: 10
     
     steps:
-      - name: Request Manual Approval
+      - name: Wait for Manual Approval
         uses: hmarr/auto-approve-action@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       
+      - name: Manual Approval Step
+        run: |
+          echo "Waiting for manual approval..."
+          sleep 600 # Waits for 10 minutes before timing out (adjust as needed)      
       - name: Checkout repository
         uses: actions/checkout@v4
       
