@@ -9,9 +9,10 @@ variable "vpc_id" {
 }
 
 variable "subnet_ids" {
-  description = "List of public subnet IDs where the EKS nodes will be deployed"
-  type        = list(string)
+  type    = list(string)
+  default = ["subnet-018a047e6e74acc93", "subnet-0cf8dd5bd2868fff8"] # Replace with real subnet IDs from 2 different AZs
 }
+
 
 variable "eks_role_arn" {
   description = "IAM Role ARN for the EKS cluster"
