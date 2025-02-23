@@ -60,8 +60,8 @@ jobs:
           path: tfplan
 
   terraform-apply:
-    name: Terraform Apply (Manual Approval)
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    name: Terraform Apply (Manual Trigger)
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-20.04
     needs: terraform-plan
     environment:
@@ -69,15 +69,6 @@ jobs:
     timeout-minutes: 10
     
     steps:
-      - name: Wait for Manual Approval
-        uses: hmarr/auto-approve-action@v3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Manual Approval Step
-        run: |
-          echo "Waiting for manual approval..."
-          sleep 600 # Waits for 10 minutes before timing out (adjust as needed)      
       - name: Checkout repository
         uses: actions/checkout@v4
       
@@ -101,5 +92,5 @@ jobs:
       - name: Terraform Init
         run: terraform init
       
-      - name: Terraform Apply (Requires Manual Approval)
+      - name: Terraform Apply
         run: terraform apply -lock-timeout=300s -var="aws_region=${{ secrets.AWS_REGION }}" -var="cluster_name=${{ secrets.CLUSTER_NAME }}" -var="vpc_cidr=${{ secrets.VPC_CIDR }}" tfplan
