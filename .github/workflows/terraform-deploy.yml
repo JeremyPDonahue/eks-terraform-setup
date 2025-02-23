@@ -28,7 +28,10 @@ jobs:
       
       - name: Debug AWS Latency
         run: time aws sts get-caller-identity
-      
+
+      - name: Debug S3 State Retrieval
+        run: time aws s3 cp s3://js-test-cluster-state-bucket/eks-cluster/terraform.tfstate .
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
