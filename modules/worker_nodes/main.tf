@@ -12,6 +12,7 @@ resource "aws_eks_node_group" "worker_nodes" {
   tags = {
     Name = "eks-worker-nodes"
   }
+  
 }
 
 resource "aws_security_group" "worker_nodes_sg" {
