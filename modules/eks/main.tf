@@ -9,4 +9,6 @@ resource "aws_eks_cluster" "js-test-cluster" {
   tags = {
     Name = var.cluster_name
   }
+
+  depends_on = [module.vpc]
 }
