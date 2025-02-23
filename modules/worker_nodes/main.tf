@@ -13,7 +13,7 @@ resource "aws_eks_node_group" "worker_nodes" {
     Name = "eks-worker-nodes"
   }
 
-  depends_on = [module.eks.aws_eks_cluster.js-test-cluster]
+  depends_on = [module.eks]
 
 }
 
