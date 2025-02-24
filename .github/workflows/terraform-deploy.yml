@@ -36,6 +36,15 @@ jobs:
         with:
           terraform_version: latest
       
+      - name: Force Unlock Terraform State (If Needed)
+        continue-on-error: true
+        run: |
+          LOCK_ID=$(terraform force-unlock -force 2>&1 | grep -oE "[a-f0-9-]{36}" || echo "")
+          if [[ ! -z "$LOCK_ID" ]]; then
+            echo "Unlocking Terraform state: $LOCK_ID"
+            terraform force-unlock -force "$LOCK_ID"
+          fi
+      
       - name: Cleanup Terraform Cache
         run: |
           rm -rf .terraform
