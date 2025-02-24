@@ -27,6 +27,7 @@ This Terraform project provisions an **Amazon EKS cluster** with a **VPC, IAM ro
 ## Usage
 ```sh
 terraform init
+terraform plan -auto-approve
 terraform apply -auto-approve
 aws eks update-kubeconfig --region <region> --name <cluster_name>
 ```
