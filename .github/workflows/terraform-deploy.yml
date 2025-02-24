@@ -17,7 +17,7 @@ jobs:
   terraform-cleanup:
     name: Terraform Cleanup
     if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 5
     
     steps:
@@ -52,8 +52,8 @@ jobs:
   
   terraform-plan:
     name: Terraform Plan
-    runs-on: ubuntu-20.04
-    timeout-minutes: 3
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
     
     steps:
       - name: Checkout repository
@@ -84,7 +84,10 @@ jobs:
         run: terraform validate
       
       - name: Terraform Plan
-        run: terraform plan -parallelism=10 -lock-timeout=180s -var="aws_region=${{ secrets.AWS_REGION }}" -var="cluster_name=${{ secrets.CLUSTER_NAME }}" -var="vpc_cidr=${{ secrets.VPC_CIDR }}" -out=tfplan 
+        run: terraform plan -parallelism=10 -lock-timeout=300s -var="aws_region=${{ secrets.AWS_REGION }}" -var="cluster_name=${{ secrets.CLUSTER_NAME }}" -var="vpc_cidr=${{ secrets.VPC_CIDR }}" -out=tfplan
+      
+      - name: Show Terraform Plan
+        run: terraform show -no-color tfplan
       
       - name: Upload Plan Artifact
         uses: actions/upload-artifact@v4
@@ -95,7 +98,7 @@ jobs:
   terraform-apply:
     name: Terraform Apply (Manual Trigger)
     if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: terraform-plan
     environment:
       name: production
@@ -131,7 +134,7 @@ jobs:
   terraform-destroy:
     name: Terraform Destroy (Manual Trigger)
     if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     environment:
       name: production
     timeout-minutes: 15
