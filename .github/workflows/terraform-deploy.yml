@@ -29,7 +29,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
+          aws-region: ${{ secrets.AWS_REGION }}
       
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -43,8 +43,8 @@ jobs:
   
   terraform-plan:
     name: Terraform Plan
-    runs-on: ubuntu-20.04
-    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     
     steps:
       - name: Checkout repository
@@ -55,7 +55,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
+          aws-region: ${{ secrets.AWS_REGION }}
       
       - name: Debug AWS Latency
         run: time aws sts get-caller-identity
@@ -75,7 +75,11 @@ jobs:
         run: terraform validate
       
       - name: Terraform Plan
-        run: terraform plan -parallelism=10 -lock-timeout=300s -var="aws_region=${{ secrets.AWS_REGION }}" -var="cluster_name=${{ secrets.CLUSTER_NAME }}" -var="vpc_cidr=${{ secrets.VPC_CIDR }}" -out=tfplan
+        run: terraform plan -parallelism=10 -lock-timeout=300s -out=tfplan
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          CLUSTER_NAME: ${{ secrets.CLUSTER_NAME }}
+          VPC_CIDR: ${{ secrets.VPC_CIDR }}
       
       - name: Show Terraform Plan
         run: terraform show -no-color tfplan
@@ -93,7 +97,7 @@ jobs:
     needs: terraform-plan
     environment:
       name: production
-    timeout-minutes: 10
+    timeout-minutes: 15
     
     steps:
       - name: Checkout repository
@@ -104,7 +108,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
+          aws-region: ${{ secrets.AWS_REGION }}
       
       - name: Download Plan Artifact
         uses: actions/download-artifact@v4
@@ -120,15 +124,19 @@ jobs:
         run: terraform init
       
       - name: Terraform Apply
-        run: terraform apply -lock-timeout=300s -var="aws_region=${{ secrets.AWS_REGION }}" -var="cluster_name=${{ secrets.CLUSTER_NAME }}" -var="vpc_cidr=${{ secrets.VPC_CIDR }}" tfplan
+        run: terraform apply -lock-timeout=300s tfplan
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          CLUSTER_NAME: ${{ secrets.CLUSTER_NAME }}
+          VPC_CIDR: ${{ secrets.VPC_CIDR }}
 
   terraform-destroy:
     name: Terraform Destroy (Manual Trigger)
     if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     environment:
       name: production
-    timeout-minutes: 10
+    timeout-minutes: 15
     
     steps:
       - name: Checkout repository
@@ -139,7 +147,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
+          aws-region: ${{ secrets.AWS_REGION }}
       
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -150,4 +158,8 @@ jobs:
         run: terraform init
       
       - name: Terraform Destroy (Requires Manual Trigger)
-        run: terraform destroy -auto-approve -var="aws_region=${{ secrets.AWS_REGION }}" -var="cluster_name=${{ secrets.CLUSTER_NAME }}" -var="vpc_cidr=${{ secrets.VPC_CIDR }}"
+        run: terraform destroy -auto-approve
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          CLUSTER_NAME: ${{ secrets.CLUSTER_NAME }}
+          VPC_CIDR: ${{ secrets.VPC_CIDR }}
