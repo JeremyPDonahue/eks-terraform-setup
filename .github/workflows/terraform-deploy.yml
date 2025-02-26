@@ -84,7 +84,7 @@ jobs:
         run: terraform validate
       
       - name: Terraform Plan
-        run: terraform plan -parallelism=10 -lock-timeout=300s -var="aws_region="us-west-2" -var="cluster_name=${{ secrets.CLUSTER_NAME }}" -var="vpc_cidr=${{ secrets.VPC_CIDR }}" -out=tfplan
+        run: terraform plan -parallelism=10 -lock-timeout=300s -var="aws_region=us-west-2" -var="cluster_name=${{ secrets.CLUSTER_NAME }}" -var="vpc_cidr=${{ secrets.VPC_CIDR }}" -out=tfplan
 
       - name: Show Terraform Plan
         run: terraform show -no-color tfplan
