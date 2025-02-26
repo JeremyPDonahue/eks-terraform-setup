@@ -15,7 +15,7 @@ module "eks" {
   vpc_id       = module.vpc.vpc_id
 
   subnet_ids = [
-    "subnet-05a2a065ed0df87ad", # us-west-2d
+    "subnet-01c114eb058b4569c", # us-west-2a
     "subnet-0cfd1c548c66d072e"  # us-west-2b
   ]
   eks_role_arn = module.iam.eks_role_arn
