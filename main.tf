@@ -13,6 +13,7 @@ module "eks" {
   source       = "./modules/eks"
   cluster_name = var.cluster_name
   vpc_id       = module.vpc.vpc_id
+  aws_region   = var.aws_region
   subnet_ids = [
     "subnet-05a2a065ed0df87ad", # us-west-2d
     "subnet-0cfd1c548c66d072e"  # us-west-2b
