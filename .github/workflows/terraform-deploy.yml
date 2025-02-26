@@ -77,12 +77,9 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
-      - name: Troubleshoot Region
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-        run: |
-          echo "AWS_REGION=$AWS_REGION"
-          env
+      - name: Debug Environment Variables
+        run: env
+
 
       - name: Terraform Plan
         run: terraform plan -parallelism=10 -lock-timeout=180s -var=aws_region=${{ secrets.AWS_REGION }} -var=cluster_name=${{ secrets.CLUSTER_NAME }} -var=vpc_cidr=${{ secrets.VPC_CIDR }} -out=tfplan
