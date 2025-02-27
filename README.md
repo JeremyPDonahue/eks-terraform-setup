@@ -5,34 +5,45 @@ This Terraform project provisions an **Amazon EKS cluster** with a **VPC, IAM ro
 
 ## Structure
 ```
-.
-├── modules/
-│   ├── vpc/           # VPC and subnets
-│   ├── iam/           # IAM roles and policies
-│   ├── eks/           # EKS cluster
-│   ├── worker_nodes/  # Worker nodes
-│
-├── provider.tf        # Provider configuration
-├── main.tf            # Root module
-├── variables.tf       # Input variables
-├── outputs.tf         # Outputs
-├── .gitignore         # Ignore Terraform state files
+.github
+│   └── workflows
+│       └── terraform-deploy.yml
+├── README.md
+├── backend.tf
+├── main.tf
+├── modules
+│   ├── eks
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   ├── iam
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   ├── vpc
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   └── worker_nodes
+│       ├── main.tf
+│       ├── outputs.tf
+│       └── variables.tf
+├── outputs.tf
+├── provider.tf
+└── variables.tf
 ```
 
 ## Prerequisites
+- **AWS Account**
 - **Terraform v1.3.0+**
 - **AWS CLI configured**
 - **kubectl installed**
 
 ## Usage
+To run manually from your CLI, you can use Terraform locally. However, I have included a workflows file which implements a pipeline so it can be deploy directly from GitHub.
+
 ```sh
 terraform init
-terraform plan -auto-approve
-terraform apply -auto-approve
-aws eks update-kubeconfig --region <region> --name <cluster_name>
+terraform plan
+terraform apply
 ```
-
-## Outputs
-- **EKS Cluster ID**
-- **EKS API Endpoint**
-- **Worker Node Group Name**
