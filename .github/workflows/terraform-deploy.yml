@@ -108,8 +108,6 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.event.inputs.apply == 'true'
     runs-on: ubuntu-22.04
     needs: terraform-plan
-    environment:
-      name: production
     timeout-minutes: 15
     
     steps:
@@ -147,8 +145,6 @@ jobs:
     name: Terraform Destroy (Manual Trigger)
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.event.inputs.apply == 'true'
     runs-on: ubuntu-22.04
-    environment:
-      name: production
     timeout-minutes: 15
     
     steps:
