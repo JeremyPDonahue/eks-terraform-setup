@@ -13,7 +13,6 @@ variable "subnet_ids" {
   default = ["subnet-018a047e6e74acc93", "subnet-0cf8dd5bd2868fff8"]
 }
 
-
 variable "eks_role_arn" {
   description = "IAM Role ARN for the EKS cluster"
   type        = string

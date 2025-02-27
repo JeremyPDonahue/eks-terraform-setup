@@ -17,7 +17,7 @@ jobs:
   terraform-cleanup:
     name: Terraform Cleanup
     if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 5
     
     steps:
@@ -43,7 +43,7 @@ jobs:
   
   terraform-plan:
     name: Terraform Plan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
     
     steps:
@@ -74,12 +74,15 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
       
+      - name: Terraform Validate
+        run: terraform validate
+
       - name: Terraform Plan
-        run: terraform plan -parallelism=10 -lock-timeout=300s -out=tfplan
+        run: terraform plan -out=tfplan
         env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          CLUSTER_NAME: ${{ secrets.CLUSTER_NAME }}
-          VPC_CIDR: ${{ secrets.VPC_CIDR }}
+          TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
+          TF_VAR_cluster_name: ${{ secrets.CLUSTER_NAME }}
+          TF_VAR_vpc_cidr: ${{ secrets.VPC_CIDR }}
       
       - name: Show Terraform Plan
         run: terraform show -no-color tfplan
@@ -93,7 +96,7 @@ jobs:
   terraform-apply:
     name: Terraform Apply (Manual Trigger)
     if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: terraform-plan
     environment:
       name: production
@@ -124,16 +127,16 @@ jobs:
         run: terraform init
       
       - name: Terraform Apply
-        run: terraform apply -lock-timeout=300s tfplan
+        run: terraform apply tfplan
         env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          CLUSTER_NAME: ${{ secrets.CLUSTER_NAME }}
-          VPC_CIDR: ${{ secrets.VPC_CIDR }}
+          TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
+          TF_VAR_cluster_name: ${{ secrets.CLUSTER_NAME }}
+          TF_VAR_vpc_cidr: ${{ secrets.VPC_CIDR }}
 
   terraform-destroy:
     name: Terraform Destroy (Manual Trigger)
     if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     environment:
       name: production
     timeout-minutes: 15
@@ -160,6 +163,6 @@ jobs:
       - name: Terraform Destroy (Requires Manual Trigger)
         run: terraform destroy -auto-approve
         env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          CLUSTER_NAME: ${{ secrets.CLUSTER_NAME }}
-          VPC_CIDR: ${{ secrets.VPC_CIDR }}
+          TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
+          TF_VAR_cluster_name: ${{ secrets.CLUSTER_NAME }}
+          TF_VAR_vpc_cidr: ${{ secrets.VPC_CIDR }}
