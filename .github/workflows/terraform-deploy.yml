@@ -143,9 +143,8 @@ jobs:
 
   terraform-destroy:
     name: Terraform Destroy (Manual Trigger)
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.event.inputs.apply == 'true'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.event.inputs.destroy == 'true'
     runs-on: ubuntu-22.04
-    needs: terraform-plan
     timeout-minutes: 15
     
     steps:
