@@ -8,6 +8,16 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      apply:
+        description: "Run Terraform Apply"
+        required: false
+        default: "false"
+      destroy:
+        description: "Run Terraform Destroy"
+        required: false
+        default: "false"
+
 
 permissions:
   pull-requests: write
@@ -95,7 +105,7 @@ jobs:
 
   terraform-apply:
     name: Terraform Apply (Manual Trigger)
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.event.inputs.apply == 'true'
     runs-on: ubuntu-22.04
     needs: terraform-plan
     environment:
@@ -135,7 +145,7 @@ jobs:
 
   terraform-destroy:
     name: Terraform Destroy (Manual Trigger)
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.event.inputs.apply == 'true'
     runs-on: ubuntu-22.04
     environment:
       name: production
