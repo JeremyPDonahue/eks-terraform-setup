@@ -14,10 +14,8 @@ module "eks" {
   cluster_name = var.cluster_name
   vpc_id       = module.vpc.vpc_id
 
-  subnet_ids = [
-    "subnet-01c114eb058b4569c", # us-west-2a
-    "subnet-0cfd1c548c66d072e"  # us-west-2b
-  ]
+  subnet_ids = module.vpc.public_subnet_ids
+
   eks_role_arn = module.iam.eks_role_arn
 }
 

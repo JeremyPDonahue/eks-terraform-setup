@@ -172,3 +172,48 @@ jobs:
           TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
           TF_VAR_cluster_name: ${{ secrets.CLUSTER_NAME }}
           TF_VAR_vpc_cidr: ${{ secrets.VPC_CIDR }}
+  
+  terraform-reset:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    name: Terraform Full Reset (Manual Trigger)
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Force Unlock Terraform State
+        continue-on-error: true
+        run: |
+          LOCK_ID=$(terraform force-unlock -force 2>&1 | grep -oE "[a-f0-9-]{36}" || echo "")
+          if [[ ! -z "$LOCK_ID" ]]; then
+            echo "Unlocking Terraform state: $LOCK_ID"
+            terraform force-unlock -force "$LOCK_ID"
+          fi
+
+      - name: Terraform Destroy (Full Wipe)
+        run: terraform destroy -auto-approve -var="aws_region=${{ secrets.AWS_REGION }}" -var="cluster_name=${{ secrets.CLUSTER_NAME }}" -var="vpc_cidr=${{ secrets.VPC_CIDR }}"
+
+      - name: Remove Terraform State File
+        run: aws s3 rm s3://${{ secrets.S3_BUCKET }}/eks-cluster/terraform.tfstate
+
+      - name: Cleanup Terraform Cache
+        run: |
+          rm -rf .terraform
+          terraform init -upgrade
