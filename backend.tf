@@ -4,6 +4,6 @@ terraform {
     key            = "eks-cluster/terraform.tfstate"
     region         = "us-west-2"
     encrypt        = true
-    use_lockfile = "js-lock-table"
+    dynamodb_table = "js-lock-table"
   }
 }
