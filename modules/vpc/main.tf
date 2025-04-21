@@ -9,7 +9,7 @@ resource "aws_vpc" "eks_vpc" {
 }
 
 resource "aws_subnet" "public" {
-  count = 2
+  count = 3
   vpc_id = aws_vpc.eks_vpc.id
   cidr_block = cidrsubnet(var.vpc_cidr, 4, count.index + 2)
   map_public_ip_on_launch = true
