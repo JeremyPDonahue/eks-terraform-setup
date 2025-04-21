@@ -34,6 +34,11 @@ resource "aws_security_group_rule" "eks_worker_nodes_to_control_plane" {
   protocol                 = "tcp"
   security_group_id        = module.eks.cluster_security_group_id
   source_security_group_id = module.worker_nodes.worker_nodes_security_group_id
+
+  lifecycle {
+    create_before_destroy = true
+    ignore_changes        = all
+  }
 }
 
 resource "aws_security_group_rule" "eks_node_to_node" {
