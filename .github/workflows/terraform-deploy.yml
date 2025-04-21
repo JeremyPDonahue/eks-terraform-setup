@@ -17,6 +17,10 @@ on:
         description: "Run Terraform Destroy"
         required: false
         default: "false"
+      reset:
+        description: "Destroys All Resources"
+        required: false
+        default: "false"
 
 
 permissions:
@@ -179,7 +183,7 @@ jobs:
           TF_VAR_vpc_cidr: ${{ secrets.VPC_CIDR }}
   
   terraform-reset:
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.event.inputs.destroy == 'true'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.event.inputs.reset == 'true'
     name: Terraform Full Reset (Manual Trigger)
     runs-on: ubuntu-22.04
     timeout-minutes: 15
