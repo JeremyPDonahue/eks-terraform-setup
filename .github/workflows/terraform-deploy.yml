@@ -172,6 +172,7 @@ jobs:
     name: Terraform Destroy (Manual Trigger)
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.event.inputs.destroy == 'true'
     runs-on: ubuntu-22.04
+    needs: terraform-plan
     timeout-minutes: 15
     
     steps:
@@ -204,6 +205,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.event.inputs.reset == 'true'
     name: Terraform Full Reset (Manual Trigger)
     runs-on: ubuntu-22.04
+    needs: terraform-plan
     timeout-minutes: 60
 
     steps:
