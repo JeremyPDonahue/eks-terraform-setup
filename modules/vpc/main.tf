@@ -1,11 +1,10 @@
 resource "aws_vpc" "eks_vpc" {
   cidr_block           = var.vpc_cidr
-  cluster_name         = var.cluster_name
   enable_dns_support   = true
   enable_dns_hostnames = true
 
   tags = {
-    Name = "eks-vpc"
+    Name = "eks-vpc.${var.cluster_name}"
   }
 }
 
