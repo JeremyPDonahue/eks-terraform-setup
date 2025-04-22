@@ -186,7 +186,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.event.inputs.reset == 'true'
     name: Terraform Full Reset (Manual Trigger)
     runs-on: ubuntu-22.04
-    timeout-minutes: 15
+    timeout-minutes: 60
     
     steps:
       - name: Checkout repository
