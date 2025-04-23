@@ -55,17 +55,6 @@ jobs:
         with:
           terraform_version: latest
 
-      - name: Clean DynamoDB State Digest
-        run: |
-          aws dynamodb delete-item \
-             --table-name js-lock-table \
-             --key '{"LockID": {"S": "js-test-cluster-state-bucket/eks-cluster/terraform.tfstate"}}' || true
-          aws dynamodb delete-item \
-             --table-name js-lock-table \
-             --key '{"LockID": {"S": "js-test-cluster-state-bucket/eks-cluster/terraform.tfstate-md5"}}' || true
-
-      
-
       - name: Cleanup Terraform Cache
         run: |
           rm -rf .terraform
@@ -94,16 +83,6 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: latest
-
-      - name: Clean DynamoDB State Digest
-        run: |
-          aws dynamodb delete-item \
-             --table-name js-lock-table \
-             --key '{"LockID": {"S": "js-test-cluster-state-bucket/eks-cluster/terraform.tfstate"}}' || true
-          aws dynamodb delete-item \
-             --table-name js-lock-table \
-             --key '{"LockID": {"S": "js-test-cluster-state-bucket/eks-cluster/terraform.tfstate-md5"}}' || true
-
       
       - name: Terraform Init
         run: terraform init
