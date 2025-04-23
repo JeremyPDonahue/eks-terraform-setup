@@ -40,8 +40,14 @@ resource "aws_iam_role" "worker_nodes" {
 }
 
 resource "aws_iam_role_policy_attachment" "worker_nodes" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  for_each = toset([
+    "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
+    "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
+    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  ])
+
   role       = aws_iam_role.worker_nodes.name
+  policy_arn = each.value
 }
 
 resource "aws_iam_role_policy_attachment" "cni_policy" {
