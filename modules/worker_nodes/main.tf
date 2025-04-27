@@ -52,7 +52,9 @@ resource "aws_launch_template" "worker_nodes" {
     Content-Type: text/x-shellscript; charset="us-ascii"
 
     #!/bin/bash
-    /etc/eks/bootstrap.sh ${var.cluster_name}
+    /etc/eks/bootstrap.sh ${var.cluster_name} \
+      --apiserver-endpoint ${data.aws_eks_cluster.this.endpoint} \
+      --b64-cluster-ca ${data.aws_eks_cluster.this.certificate_authority.0.data}
 
     --BOUNDARY--
   EOT
