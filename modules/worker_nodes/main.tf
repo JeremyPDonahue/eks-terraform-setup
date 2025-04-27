@@ -8,7 +8,7 @@ resource "aws_eks_node_group" "worker_nodes" {
   subnet_ids     = var.subnet_ids
   ami_type       = "AL2_x86_64"
 
-  depends_on = [module.eks.aws_eks_cluster.js-test-cluster]
+  depends_on = [eks.aws_eks_cluster.js-test-cluster]
 
   scaling_config {
     desired_size = 2
