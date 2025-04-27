@@ -9,7 +9,12 @@ resource "aws_eks_node_group" "worker_nodes" {
     max_size     = 3
     min_size     = 1
   }
-  
+
+  launch_template {
+    id      = aws_launch_template.worker_nodes.id
+    version = "$Latest"
+  }
+
   tags = {
     Name = "eks-worker-nodes"
   }
@@ -35,3 +40,20 @@ resource "aws_security_group" "worker_nodes_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+resource "aws_launch_template" "worker_nodes" {
+  name_prefix   = "${var.cluster_name}-worker"
+  image_id      = data.aws_eks_node_group.default_ami_id.id
+  instance_type = "t3.medium"
+
+  network_interfaces {
+    associate_public_ip_address = true
+    security_groups = [module.worker_nodes.worker_nodes_security_group_id]  # <-- Force your custom SG
+  }
+}
+
+data "aws_eks_node_group" "default_ami_id" {
+  cluster_name = var.cluster_name
+  node_group_name = "default"
+}
+
