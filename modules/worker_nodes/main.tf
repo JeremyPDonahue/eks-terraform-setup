@@ -45,10 +45,19 @@ resource "aws_launch_template" "worker_nodes" {
   instance_type = "t3.medium"
 
   user_data = base64encode(<<-EOT
+    MIME-Version: 1.0
+    Content-Type: multipart/mixed; boundary="BOUNDARY"
+
+    --BOUNDARY
+    Content-Type: text/x-shellscript; charset="us-ascii"
+
     #!/bin/bash
     /etc/eks/bootstrap.sh ${var.cluster_name}
+
+    --BOUNDARY--
   EOT
   )
+
 
   network_interfaces {
     associate_public_ip_address = true
