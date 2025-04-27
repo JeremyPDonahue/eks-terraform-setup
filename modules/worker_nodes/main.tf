@@ -44,6 +44,12 @@ resource "aws_launch_template" "worker_nodes" {
   name_prefix   = "${var.cluster_name}-worker"
   instance_type = "t3.medium"
 
+  user_data = base64encode(<<-EOT
+    #!/bin/bash
+    /etc/eks/bootstrap.sh ${var.cluster_name}
+  EOT
+  )
+
   network_interfaces {
     associate_public_ip_address = true
     security_groups = [aws_security_group.worker_nodes_sg.id]
