@@ -43,7 +43,6 @@ resource "aws_security_group" "worker_nodes_sg" {
 
 resource "aws_launch_template" "worker_nodes" {
   name_prefix   = "${var.cluster_name}-worker"
-  image_id      = data.aws_eks_node_group.default_ami_id.id
   instance_type = "t3.medium"
 
   network_interfaces {
