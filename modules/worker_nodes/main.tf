@@ -1,3 +1,7 @@
+data "aws_eks_cluster" "this" {
+  name = var.cluster_name
+}
+
 resource "aws_eks_node_group" "worker_nodes" {
   cluster_name   = var.cluster_name
   node_role_arn  = var.worker_nodes_role_arn
