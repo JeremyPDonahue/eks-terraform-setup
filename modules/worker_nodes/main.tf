@@ -52,8 +52,3 @@ resource "aws_launch_template" "worker_nodes" {
   }
 }
 
-data "aws_eks_node_group" "default_ami_id" {
-  cluster_name = var.cluster_name
-  node_group_name = "default"
-}
-
