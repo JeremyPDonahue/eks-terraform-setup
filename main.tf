@@ -26,6 +26,9 @@ module "worker_nodes" {
   vpc_id                = module.vpc.vpc_id
   subnet_ids            = module.vpc.public_subnet_ids
   worker_nodes_role_arn = module.iam.worker_nodes_role_arn
+
+  depends_on = [module.eks]
+
 }
 
 resource "aws_security_group_rule" "eks_worker_nodes_to_control_plane" {
