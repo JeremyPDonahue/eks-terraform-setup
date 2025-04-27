@@ -48,7 +48,8 @@ resource "aws_launch_template" "worker_nodes" {
 
   network_interfaces {
     associate_public_ip_address = true
-    security_groups = [module.worker_nodes.worker_nodes_security_group_id]  # <-- Force your custom SG
+    security_groups = [aws_security_group.worker_nodes_sg.id]
+  # <-- Force your custom SG
   }
 }
 
