@@ -9,11 +9,10 @@ on:
       - main
   workflow_dispatch:
     inputs:
-      apply_cluster:
+      apply_cluster_only:
         description: "Apply EKS Cluster Only"
         required: false
         default: "false"
-    inputs:
       apply:
         description: "Run Terraform Apply"
         required: false
@@ -115,6 +114,7 @@ jobs:
           path: tfplan
 
       - name: Apply EKS Cluster Only
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.event.inputs.apply_cluster_only == 'true'
         run: terraform apply -auto-approve -target=module.eks
         env:
           TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
