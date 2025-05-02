@@ -9,6 +9,11 @@ on:
       - main
   workflow_dispatch:
     inputs:
+      apply_cluster:
+        description: "Apply EKS Cluster Only"
+        required: false
+        default: "false"
+    inputs:
       apply:
         description: "Run Terraform Apply"
         required: false
