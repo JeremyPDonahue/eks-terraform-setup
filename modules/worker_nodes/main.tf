@@ -3,10 +3,10 @@ data "aws_eks_cluster" "this" {
 }
 
 resource "aws_eks_node_group" "worker_nodes" {
-  cluster_name   = var.cluster_name
-  node_role_arn  = var.worker_nodes_role_arn
-  subnet_ids     = var.subnet_ids
-  ami_type       = "AL2_x86_64"
+  cluster_name  = var.cluster_name
+  node_role_arn = var.worker_nodes_role_arn
+  subnet_ids    = var.subnet_ids
+  ami_type      = "AL2_x86_64"
 
   scaling_config {
     desired_size = 2
@@ -30,19 +30,45 @@ resource "aws_security_group" "worker_nodes_sg" {
   description = "Security group for EKS worker nodes"
   vpc_id      = var.vpc_id
 
+  # Allow all traffic from within the VPC
   ingress {
     from_port   = 0
     to_port     = 65535
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [data.aws_vpc.cluster_vpc.cidr_block]
   }
 
-  egress {
-    from_port   = 0
-    to_port     = 65535
+  # Allow SSH access (restrict to your IP or VPC)
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.cluster_vpc.cidr_block]
+  }
+
+  # Allow HTTPS traffic from anywhere (for node registration)
+  ingress {
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  # Allow all outbound traffic
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "eks-worker-nodes-sg"
+  }
+}
+
+data "aws_vpc" "cluster_vpc" {
+  id = var.vpc_id
 }
 
 resource "aws_launch_template" "worker_nodes" {
@@ -68,8 +94,8 @@ resource "aws_launch_template" "worker_nodes" {
 
   network_interfaces {
     associate_public_ip_address = true
-    security_groups = [aws_security_group.worker_nodes_sg.id]
-  # <-- Force your custom SG
+    security_groups             = [aws_security_group.worker_nodes_sg.id]
+    # <-- Force your custom SG
   }
 }
 

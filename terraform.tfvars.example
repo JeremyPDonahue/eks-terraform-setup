@@ -1,0 +1,8 @@
+# AWS Configuration
+aws_region = "us-west-2"
+
+# EKS Cluster Configuration
+cluster_name = "js-test-cluster"
+
+# VPC Configuration
+vpc_cidr = "10.0.0.0/16"
